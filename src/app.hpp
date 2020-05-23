@@ -7,7 +7,7 @@ public:
     void setup();
     void draw(piksel::Graphics& g);
     void mouseMoved(int x, int y);
-    void mousePressed(int x, int y);
+    void mousePressed(int button);
     void keyPressed(int key);
 };
 

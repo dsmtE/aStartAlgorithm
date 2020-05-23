@@ -64,12 +64,32 @@ void App::draw(piksel::Graphics& g) {
     g.noStroke();
     for(const Cell* cell : aStar->getOpenList()) {
         glm::ivec2 pos = cell->pos_;
-        g.fill(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        g.fill(glm::vec4(0.1f, 1.0f, 0.1f, 1.0f));
         g.rect(pos.x * tileSize.x, pos.y * tileSize.y, tileSize.x, tileSize.y);
-        g.fill(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-        g.text(std::to_string((int)cell->heuristic_), pos.x * tileSize.x + tileSize.x*0.1, pos.y * tileSize.y + tileSize.y*0.2);
-        g.text(std::to_string((int)cell->cost_), pos.x * tileSize.x + tileSize.x*0.7, pos.y * tileSize.y + tileSize.y*0.2);
-        g.text(std::to_string((int)cell->heuristic_ + (int)cell->cost_), pos.x * tileSize.x + tileSize.x/2, pos.y * tileSize.y + tileSize.y/2);
+        g.fill(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        g.text(decimalToString(cell->heuristic_), pos.x * tileSize.x + tileSize.x*0.1, pos.y * tileSize.y + tileSize.y*0.2);
+        g.text(decimalToString(cell->cost_), pos.x * tileSize.x + tileSize.x*0.1, pos.y * tileSize.y + tileSize.y*0.8);
+        g.text(decimalToString(cell->heuristic_ + cell->cost_), pos.x * tileSize.x + tileSize.x*0.3, pos.y * tileSize.y + tileSize.y/2);
+    }
+
+    // draw closedListCells
+    g.noStroke();
+    for(const Cell* cell : aStar->getClosedList()) {
+        glm::ivec2 pos = cell->pos_;
+        g.fill(glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+        g.rect(pos.x * tileSize.x, pos.y * tileSize.y, tileSize.x, tileSize.y);
+        g.fill(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        g.text(decimalToString(cell->heuristic_), pos.x * tileSize.x + tileSize.x*0.1, pos.y * tileSize.y + tileSize.y*0.2);
+        g.text(decimalToString(cell->cost_), pos.x * tileSize.x + tileSize.x*0.1, pos.y * tileSize.y + tileSize.y*0.8);
+        g.text(decimalToString(cell->heuristic_ + cell->cost_), pos.x * tileSize.x + tileSize.x*0.3, pos.y * tileSize.y + tileSize.y/2);
+    }
+
+    // draw path
+    if(aStar->isDone()) {
+        g.fill(glm::vec4(0.0f, 0.6f, 0.8f, 0.2f));
+        for(auto pos : aStar->getPath()) {
+            g.rect(pos.x * tileSize.x, pos.y * tileSize.y, tileSize.x, tileSize.y);
+        }
     }
 
     // draw A & B
@@ -106,24 +126,36 @@ void App::mouseMoved(int x, int y) {
     mousePos.y = y;
 }
 
-void App::mousePressed(int x, int y) {
+void App::mousePressed(int button) {
+    if( button == 0 ) { // left click
+        const glm::ivec2 mouseCoords = mousePosToCoords();
+        // change wall state
+        grid[coordsToId(mouseCoords, cols)] = !grid[coordsToId(mouseCoords, cols)];
+        aStar->reset();
+    }
 }
 
 void App::keyPressed(int key) {
     const glm::ivec2 mouseCoords = mousePosToCoords();
-    const auto path = aStar->getPath();
     switch (key) {
     case 78: // N 
         aStar->next();
         break;
     case 67: // C
-        aStar->computeFullPath();
+        aStar->loopNextComputePath();
+        break;
+    case 82: // R
+        aStar->reset();
         break;
     case 80: // P
-        for(auto pos : path) {
-            std::cout << " -> (" << pos.x << ", " << pos.y << ")";
+        if(aStar->isDone()) {
+            for(auto pos : aStar->getPath()) {
+                std::cout << " -> "<< pos ;
+            }
+            std::cout << std::endl;
+        }else {
+            std::cout << "path not found yet" << std::endl;
         }
-        std::cout << std::endl;
         break;
     case 81: // A (on azerty)
         std::cout << "A" << std::endl;
