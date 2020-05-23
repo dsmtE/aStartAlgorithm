@@ -7,37 +7,40 @@
 
 void AStar::reset() {
     openList_ = IterablePriorityQueue<Cell*, std::vector<Cell*>, CellCompare>();
-    closedPosList_.clear();
+    closedList_.clear();
     path_.clear();
     done_ = false;
+    // on ajoute comme point de départ notre première cellule à savoir A
     openList_.push(new Cell(A_ , 0.0f, estimateHeuristicCost(A_, B_), nullptr));
 }
 
 bool AStar::next() {
-    std::cout << "next" << std::endl;
     if(!done_) { // si on à déjà fini on faire rien de plus
         Cell* current = nullptr;
         if (!openList_.empty()) {
             current = openList_.top();
-            std::cout << "(" << current->pos_.x << ", " << current->pos_.y << ")" << std::endl;
             // si on est toujours pas arrivé à notre destination on continue sinon on s'arrete ici
             if (current->pos_ != B_) {
-
+                
+                // on récupère la cellule avec le coût le plus faible
                 openList_.pop();
-                closedPosList_.push_back(current->pos_);
+
+                // on la définie comme étant explorée dans la closedList (c'est ce qu'on va faire dans la suite)
+                closedList_.push_back(current);
 
                 for (int i = 0; i < (moveDiagonally_ ? 8 : 4); i++) {
                     glm::ivec2 newPos = current->pos_ + directions[i];
-                    // on check si notre nouelle position à tester existe sur la grille et si elle n'est pas un obstacte (qu'il n'y a pas collision)
+                    // on check si notre nouvelle position à tester existe sur la grille et si elle n'est pas un obstacte (qu'il n'y a pas collision)
                     if( !isInBound(newPos, rows_, cols_) || isCollisionAt(newPos) ) {
                         // si c'est l'un des deux cas ou les deux cela ne sert à rien de continer avec celle-ci, on passe à la position suivante à tester
                         continue;
                     }
 
                     // si notre position à déjà été exploré par le passé, on passe à la suivante
-                    if( std::find(closedPosList_.begin(), closedPosList_.end(), newPos) != closedPosList_.end()) {
+                    if( std::find_if(closedList_.begin(), closedList_.end(), [newPos](const Cell* c) { return c->pos_ == newPos; }) != closedList_.end()) {
                         continue;
                     }
+
 
                     // on cherche si notre position est dans notre openList
                     Cell* neighbor = nullptr;
@@ -63,7 +66,7 @@ bool AStar::next() {
                 }
             }
         }else {
-            std::cout << "chemin impossible" << std::endl;
+            std::cout << "path can't be found" << std::endl;
         }
 
         if (current != nullptr && current->pos_ == B_) {
@@ -83,8 +86,14 @@ std::vector<glm::ivec2> AStar::calcPath(Cell* current) {
     return path_;
 }
 
-void AStar::computeFullPath() {
-    while(!next()) {}
+void AStar::loopNextComputePath() {
+    while(!next()) {
+        // prevent infinite loop when path can't be found
+        if (openList_.empty()) {
+            std::cout << "path can't be found" << std::endl;
+            break;
+        }
+    }
 }
 
 
