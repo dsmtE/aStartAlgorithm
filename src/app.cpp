@@ -20,13 +20,10 @@ glm::vec2 tileSize; // used to display our grid
 std::vector<bool> grid(gridSize); // our obstacles grid
 glm::vec2 mousePos;
 
-glm::ivec2 A(0, 0);
-glm::ivec2 B(1, 0);
+glm::ivec2 A(0, 0); // start pos
+glm::ivec2 B(1, 0); // end pos
 AStar* aStar;
 
-// inline glm::ivec2 mousePosToCoords(const glm::ivec2& mousePos, const int& w, const int& h, const int& rows, const int& cols) {
-//     return glm::ivec2(glm::clamp<int>(mousePos.x / w, 0, cols - 1), glm::clamp<int>(mousePos.y / h, 0, rows - 1));
-// }
 inline glm::ivec2 mousePosToCoords() { return glm::ivec2(glm::clamp<int>(mousePos.x / tileSize.x, 0, cols - 1), glm::clamp<int>(mousePos.y / tileSize.y, 0, rows - 1)); }
 
 void randomiseGrid(std::vector<bool>& grid) {
@@ -55,6 +52,7 @@ void App::draw(piksel::Graphics& g) {
     g.noStroke();
     g.fill(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
+    // draw grid wall
     for(int id = 0; id < gridSize; id++) {
         const glm::ivec2 coords = idToCoords(id, cols); // get coordinates
         if (grid[id]) {
@@ -70,7 +68,7 @@ void App::draw(piksel::Graphics& g) {
         g.rect(pos.x * tileSize.x, pos.y * tileSize.y, tileSize.x, tileSize.y);
         g.fill(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
         g.text(std::to_string((int)cell->heuristic_), pos.x * tileSize.x + tileSize.x*0.1, pos.y * tileSize.y + tileSize.y*0.2);
-        g.text(std::to_string((int)cell->cost_), pos.x * tileSize.x + tileSize.x*0.7, pos.y * tileSize.y + tileSize.y*0.2;
+        g.text(std::to_string((int)cell->cost_), pos.x * tileSize.x + tileSize.x*0.7, pos.y * tileSize.y + tileSize.y*0.2);
         g.text(std::to_string((int)cell->heuristic_ + (int)cell->cost_), pos.x * tileSize.x + tileSize.x/2, pos.y * tileSize.y + tileSize.y/2);
     }
 
