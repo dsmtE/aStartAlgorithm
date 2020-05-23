@@ -142,6 +142,7 @@ void App::keyPressed(int key) {
         aStar->next();
         break;
     case 67: // C
+        // aStar->computePath();
         aStar->loopNextComputePath();
         break;
     case 82: // R

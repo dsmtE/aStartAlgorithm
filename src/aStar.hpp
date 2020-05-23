@@ -33,7 +33,7 @@ private:
 
     const std::vector<bool>& grid_;
     int cols_, rows_;
-    glm::ivec2& A_, B_;
+    glm::ivec2 A_, B_;
     bool moveDiagonally_;
     int weigth_;
 
@@ -51,6 +51,7 @@ public:
     void reset();
     bool next();
     void loopNextComputePath();
+    std::vector<glm::ivec2> computePath();
     std::vector<glm::ivec2> calcPath(Cell* current);
 
     inline auto getOpenList() { return openList_; };
