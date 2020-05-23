@@ -14,13 +14,6 @@ struct Cell {
     Cell(const glm::ivec2& pos, const float& cost, const float& heuristic, Cell* cameFrom)
         : pos_(pos), cost_(cost), heuristic_(heuristic), cameFrom_(cameFrom) {
     }
-
-    Cell(const int& x, const int& y, const float& cost, const float& heuristic, Cell* cameFrom)
-        : Cell(glm::ivec2(x, y), cost, heuristic, cameFrom) {
-    }
-
-    inline bool hasCoords(const int& x, const  int& y) { return hasCoords(glm::ivec2(x, y)); }
-    inline bool hasCoords(const glm::ivec2& pos) { return pos_ == pos; }
 };
 
 struct CellCompare {
@@ -28,7 +21,6 @@ struct CellCompare {
         return a->cost_ + a->heuristic_ > b->cost_ + b->heuristic_;
     }
 };
-
 
 class AStar {
 
@@ -48,7 +40,7 @@ private:
     std::vector<glm::ivec2> path_;
     bool done_;
     IterablePriorityQueue<Cell*, std::vector<Cell*>, CellCompare> openList_;
-    std::vector<glm::ivec2> closedPosList_;
+    std::vector<Cell*> closedList_;
 
 public:
     AStar(const std::vector<bool>& grid, const int& cols, const int& rows, glm::ivec2& A, glm::ivec2& B, const bool& moveDiagonally = false, const int& weigth = 1) : 
@@ -58,10 +50,11 @@ public:
 
     void reset();
     bool next();
-    void computeFullPath();
+    void loopNextComputePath();
     std::vector<glm::ivec2> calcPath(Cell* current);
 
     inline auto getOpenList() { return openList_; };
+    inline std::vector<Cell*> getClosedList() { return closedList_; };
     inline std::vector<glm::ivec2> getPath() { return path_; };
     inline void setA(const glm::ivec2& A) { A_ = A; };
     inline void setB(const glm::ivec2& B) { B_ = B; };
