@@ -1,6 +1,15 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <sstream>
+#include <iomanip>
+
+template <typename T>
+std::string decimalToString(const T& value, const int& p = 2) {
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(p) << value;
+    return stream.str();
+}
 
 // usful functions
 inline int coordsToId(const int& x, const int& y, const int& cols) { return y * cols + x; }
@@ -12,3 +21,9 @@ inline bool isInBound(const glm::ivec2& pos, const int& rows, const int& cols) {
 
 // compute the manhattan distance between two glm vec2
 inline float manhattanDist(const glm::vec2& a, const glm::vec2& b) { return glm::dot(glm::abs(a - b), glm::vec2(1, 1)); }
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const glm::tvec2<T>& vec2) {
+    os << "(" << vec2.x << ", " << vec2.y << ")";
+    return os;
+}
