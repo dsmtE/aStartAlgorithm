@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(lib/piksel)
 
-set(MAIN_FILE ${PROJECT_SOURCE_DIR}/src/main.cpp)
+set(MAIN_FILE ${PROJECT_SOURCE_DIR}/src/AstarAlgorithm.cpp)
 
 file(GLOB_RECURSE SRC_FILES "src/*")
 
